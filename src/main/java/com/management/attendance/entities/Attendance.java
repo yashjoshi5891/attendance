@@ -17,7 +17,5 @@ public class Attendance {
 
     private Date
 
-    @OneToOne
-    @JoinColumn(name = "emp_id")
     private Employee employee;
 }

@@ -19,4 +19,5 @@ public class Employee {
 
     @OneToOne(mappedBy ="employee", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Attendance attendance;
+    private int s;
 }
