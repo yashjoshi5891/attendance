@@ -11,8 +11,8 @@ import javax.persistence.*;
 @Setter
 public class Employee {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
     private String username;
     private String email;
     private String password;

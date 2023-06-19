@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -12,10 +13,11 @@ import java.util.Date;
 @Setter
 public class Attendance {
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
-    private Date date;
-    private Date check_in;
-    private Date check_out;
+    private java.sql.Date date;
+    private java.sql.Time check_in;
+    private java.sql.Time check_out;
     private String type;
     @OneToOne
     @JoinColumn(name="emp_id")
