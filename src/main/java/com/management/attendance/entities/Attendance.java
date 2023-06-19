@@ -14,8 +14,10 @@ public class Attendance {
     @Id
     private Long id;
     private Date date;
-
-    private Date
-
+    private Date check_in;
+    private Date check_out;
+    private String type;
+    @OneToOne
+    @JoinColumn(name="emp_id")
     private Employee employee;
 }
