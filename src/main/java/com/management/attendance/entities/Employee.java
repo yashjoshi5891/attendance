@@ -20,4 +20,7 @@ public class Employee {
     @OneToOne(mappedBy ="employee", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Attendance attendance;
 
+    @OneToOne(mappedBy = "employee",cascade =CascadeType.ALL,fetch = FetchType.EAGER)
+    private Leave leave;
+
 }
