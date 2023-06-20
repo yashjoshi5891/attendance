@@ -7,17 +7,21 @@ import com.management.attendance.exceptions.ResourceNotFoundException;
 import com.management.attendance.repositories.AttendanceRepo;
 import com.management.attendance.repositories.EmployeeRepo;
 import com.management.attendance.services.AttendanceService;
-import lombok.Setter;
-import net.bytebuddy.asm.Advice;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalTime;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.time.LocalDate.*;
 
 @Service
 public class AttendanceServiceImpl implements AttendanceService {
@@ -32,46 +36,94 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     public AttendanceDto createAttendance(AttendanceDto attendanceDto, Long empId) {
-        long millis=System.currentTimeMillis();
-
-        // creating a new object of the class Date
-        java.sql.Date date = new java.sql.Date(millis);
-
-        java.sql.Time time=new java.sql.Time(millis);
+        Date date=new Date();
+        Calendar c=Calendar.getInstance();
+        c.setTime(date);
+        String day=new SimpleDateFormat("EEEE").format(date);
 
 
 
         Employee employee=employeeRepo.findById(empId).orElseThrow(()->new ResourceNotFoundException("Employee","empId",empId));
-
         Attendance attendance=modelMapper.map(attendanceDto,Attendance.class);
-        attendance.setCheck_in(time);
-        attendance.setCheck_in(null);
-        attendance.setDate(date);
-        attendance.setEmployee(employee);
 
-        Attendance savedAttendance=attendanceRepo.save(attendance);
+        if(day.equals("Sunday")){
+            attendance.setDate(now());
+            attendance.setCheck_in(null);
+            attendance.setCheck_out(null);
+            attendance.setType("Holiday");
 
-        return modelMapper.map(savedAttendance,AttendanceDto.class);
+            Attendance savedAttendance=attendanceRepo.save(attendance);
+            return modelMapper.map(savedAttendance,AttendanceDto.class);
+        }
+        else{
 
+            if(attendanceRepo.findByEmployeeAndDate(empId,LocalDate.now())==null){
+                attendance.setDate(now());
+                attendance.setCheck_in(LocalTime.now());
+                attendance.setCheck_out(null);
+                attendance.setEmployee(employee);
+                attendance.setType(attendanceDto.getType());
+                Attendance savedAttendance=attendanceRepo.save(attendance);
+
+                return modelMapper.map(savedAttendance,AttendanceDto.class);
+            }
+
+            else{
+
+                return modelMapper.map(attendanceRepo.findByEmployeeAndDate(empId,LocalDate.now()),AttendanceDto.class);
+            }
+
+        }
     }
 
     @Override
-    public AttendanceDto updateAttendance(AttendanceDto attendanceDto, long id) {
-        return null;
+    public AttendanceDto updateAttendanceByEmployeeAndDate(long empId, LocalDate date) {
+        Attendance attendance=attendanceRepo.findByEmployeeAndDate(empId,date);
+        attendance.setCheck_out(LocalTime.now());
+        Attendance updatedAttendance=attendanceRepo.save(attendance);
+        return modelMapper.map(updatedAttendance,AttendanceDto.class);
     }
 
+
     @Override
-    public AttendanceDto getAttendance(int id) {
-        return null;
+    public AttendanceDto getAttendance(Long id) {
+        return modelMapper.map(attendanceRepo.
+                findById(id).
+                orElseThrow(()->new ResourceNotFoundException("Attendance Record","id",id)),AttendanceDto.class);
     }
 
     @Override
     public List<AttendanceDto> getAllAttendance() {
-        return null;
+        List<Attendance> attendances=attendanceRepo.findAll();
+        List<AttendanceDto> attendanceDtos=attendances
+                .stream()
+                .map(attendance -> modelMapper.map(attendance,AttendanceDto.class))
+                .collect(Collectors.toList());
+        return attendanceDtos;
     }
 
     @Override
-    public void deleteAttendance() {
-
+    public void deleteAttendance(Long id) {
+        Attendance attendance=attendanceRepo.findById(id).orElseThrow(()->new ResourceNotFoundException("Attendance Record","id :",id));
+        attendanceRepo.deleteById(id);
     }
+
+    @Override
+    public List<AttendanceDto> getAttendanceByEmployee(Long empId) {
+        Employee employee=employeeRepo.findById(empId).orElseThrow(()->new ResourceNotFoundException("Employee","empId :",empId));
+        List<Attendance> attendances=attendanceRepo.findByEmployee(employee);
+
+        return attendances.stream().map(attendance -> modelMapper.map(attendance,AttendanceDto.class)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AttendanceDto> getAttendanceByDate(LocalDate date) {
+        List<Attendance> attendances=attendanceRepo.findByDate(date);
+
+        return attendances.stream().map(attendance -> modelMapper.map(attendance,AttendanceDto.class)).collect(Collectors.toList());
+    }
+
+
+
+
 }

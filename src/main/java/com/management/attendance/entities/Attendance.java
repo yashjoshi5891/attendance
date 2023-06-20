@@ -4,8 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Entity
 @Table(name="Attendance")
@@ -13,13 +13,16 @@ import java.util.Date;
 @Setter
 public class Attendance {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private java.sql.Date date;
-    private java.sql.Time check_in;
-    private java.sql.Time check_out;
+    private LocalDate date;
+
+
+    private LocalTime check_in;
+    private LocalTime check_out;
+
     private String type;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name="emp_id")
     private Employee employee;
 }

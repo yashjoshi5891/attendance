@@ -8,6 +8,7 @@ import java.util.Date;
 @Getter
 @Setter
 public class LeaveDto {
+
     private long id;
     private Date fromDate;
     private Date toDate;

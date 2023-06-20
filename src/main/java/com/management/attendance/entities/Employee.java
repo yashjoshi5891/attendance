@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name="Employees")
@@ -11,16 +12,19 @@ import javax.persistence.*;
 @Setter
 public class Employee {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private String username;
+    @Column(nullable = false)
     private String email;
+    @Column(nullable = false)
     private String password;
 
-    @OneToOne(mappedBy ="employee", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Attendance attendance;
+    @OneToMany(mappedBy ="employee",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    private List<Attendance> attendanceList;
 
-    @OneToOne(mappedBy = "employee",cascade =CascadeType.ALL,fetch = FetchType.EAGER)
-    private Leave leave;
+    @OneToMany(mappedBy = "employee",cascade =CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<Leave>leaves;
 
 }

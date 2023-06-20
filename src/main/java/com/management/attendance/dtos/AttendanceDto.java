@@ -5,8 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotEmpty;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Date;
 
 
@@ -15,10 +16,11 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AttendanceDto {
-    private long id;
-    private Date date;
-    private LocalDateTime check_in;
-    private LocalDateTime check_out;
+    private Long id;
+    private LocalDate date;
+    private LocalTime check_in;
+    private LocalTime check_out;
+    @NotEmpty
     private String type;
     private EmployeeDto employee;
 

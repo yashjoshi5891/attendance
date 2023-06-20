@@ -15,7 +15,7 @@ public class Leave {
     private String reason;
     private String status;
 
-    @OneToOne
+    @ManyToOne 
     @JoinColumn(name = "emp_id")
     private Employee employee;
 }
